@@ -28,6 +28,18 @@
     boolean excludeTable = "true".equals(ElementParameterParser.getValue(node, "__EXCLUDE_TABLE__"));
 
     boolean dieOnError = "true".equals(ElementParameterParser.getValue(node, "__DIE_ON_ERROR__"));
+    
+    List<Map<String,String>> genericArgs = new java.util.ArrayList<Map<String,String>>();
+	List<Map<String,String>> toolSpecificArgs = new java.util.ArrayList<Map<String,String>>();
+	if(additionalList != null){ 
+		for(Map<String,String> additionalMap : additionalList){ 
+			if (additionalMap.get("ADDITIONAL_ARGUMENT").startsWith("\"--") || additionalMap.get("ADDITIONAL_ARGUMENT").startsWith("--")){
+				toolSpecificArgs.add(additionalMap);
+			} else if (additionalMap.get("ADDITIONAL_ARGUMENT").startsWith("-") || additionalMap.get("ADDITIONAL_ARGUMENT").startsWith("\"-")) {
+				genericArgs.add(additionalMap);
+			}
+		}
+	}
 %>
 
 <%@ include file="@{org.talend.designer.components.bigdata}/components/templates/Sqoop/SqoopAdditionalArgumentParser.javajet"%>
@@ -41,10 +53,24 @@ String passwordFieldName = "__PASSWORD__";
 
 <%@ include file="@{org.talend.designer.components.localprovider}/components/templates/password.javajet"%>		
 
-String[] cmd_<%=cid %> = new String[] {"sqoop", "import-all-tables", "--connect", <%=connection%>, "--username", <%=username%>
-<%if(passwordStoredInFile) {%>
+String[] cmd_<%=cid %> = new String[] {"sqoop", "import-all-tables"
+<%
+for(Map<String,String> genericArg : genericArgs){
+	if(genericArg.get("ADDITIONAL_VALUE")!=null || !"".equals(genericArg.get("ADDITIONAL_VALUE"))) {
+	String arg = genericArg.get("ADDITIONAL_ARGUMENT").replaceAll("\"","") + "=" + genericArg.get("ADDITIONAL_VALUE").replaceAll("\"","");
+%>
+		,"<%=arg%>"
+<%
+	}
+}
+%>
+, "--connect", <%=connection%>
+<% if (!"".equals(username.replaceAll("\"",""))) {%>
+, "--username", <%=username%>
+<%}
+if(passwordStoredInFile) {%>
 	, "--password-file", <%=(String)ElementParameterParser.getValue(node, "__PASSWORD_FILE__")%>
-<%} else {%>
+<%} else if (!"".equals(ElementParameterParser.getValue(node, "__PASSWORD__").replaceAll("\"",""))) {%>
 	, "--password", decryptedPassword_<%=cid%>
 <%}%>
 <%if(printLog && verbose){%>, "--verbose"<%}%>
@@ -95,22 +121,15 @@ if(excludeTable) {
 	}
 }
 
-boolean isNull=false; 
-if(additionalList != null){ 
-    for(Map<String,String> additionalMap : additionalList){ 
-        isNull=false; 
-        if(additionalMap.get("ADDITIONAL_VALUE")==null || "".equals(additionalMap.get("ADDITIONAL_VALUE"))) { 
-            isNull=true; 
-        } 
-        if(!isNull) { 
+for(Map<String,String> toolSpecificArg : toolSpecificArgs){ 
+    if(toolSpecificArg.get("ADDITIONAL_VALUE")!=null || !"".equals(toolSpecificArg.get("ADDITIONAL_VALUE"))) { 
 %> 
-            ,"<%=additionalMap.get("ADDITIONAL_ARGUMENT")%>", <%=additionalMap.get("ADDITIONAL_VALUE")%> 
+       ,<%=toolSpecificArg.get("ADDITIONAL_ARGUMENT")%>, <%=toolSpecificArg.get("ADDITIONAL_VALUE")%> 
 <% 
-        } else { 
+    } else {
 %> 
-            ,"<%=additionalMap.get("ADDITIONAL_ARGUMENT")%>" 
+       ,<%=toolSpecificArg.get("ADDITIONAL_ARGUMENT")%>
 <% 
-        } 
     } 
 } 
 
@@ -137,9 +156,6 @@ if(overrideHiveMapping) {
 }
 %>
 };
-
-String[] additionalArgs_<%=cid%> = parser_<%=cid%>.parse(<%=additionalCommandLineArguments%>);
-cmd_<%=cid %> = (String[]) org.apache.commons.lang.ArrayUtils.addAll(cmd_<%=cid %>, additionalArgs_<%=cid%>);
 
 <%if(isLog4jEnabled) {%>
 java.lang.StringBuilder stringBuilder_<%=cid%> = new java.lang.StringBuilder();
