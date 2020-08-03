@@ -12,7 +12,8 @@
   "description": "",
   "supportedSparkVersions": [
     "SPARK_1_6",
-    "SPARK_2_1"
+    "SPARK_2_1",
+    "SPARK_2_3"
   ],
   "modules": [
     {
@@ -933,6 +934,15 @@
       "description": ""
     },
     {
+      "id": "stax-api-1.0.1.jar",
+      "type": "STANDARD",
+      "context": "{properties.context}",
+      "jarName": "stax-api-1.0.1.jar",
+      "mvnUri": "mvn:org.talend.libraries/stax-api-1.0.1/6.0.0",
+      "useStudioRepository": "true",
+      "description": ""
+    },
+    {
       "id": "jline-2.10.4",
       "type": "STANDARD",
       "context": "{properties.context}",
@@ -1214,23 +1224,6 @@
         "hadoop-client",
         "hadoop-aws",
         "talend-bigdata-aws-1.0.0-20180116"
-      ],
-      "exclusions": [
-        {
-          "groupId": "com.fasterxml.jackson.core",
-          "artifactId": "jackson-core",
-          "classifier": "",
-          "version": "2.6.6",
-          "extension": "",
-          "description": ""
-        },
-      ]
-    },
-    {
-      "id": "HDFS-NOT-SPARK-1-6-LIB-DYNAMIC",
-      "description": "Hdfs libraries for every execution engine except Spark 1.6",
-      "modules": [
-      	"jackson-core-2.6.6"
       ]
     },
     {
@@ -1393,23 +1386,6 @@
       "modules": [
         "tez-dag",
         "tez-mapreduce"
-      ],
-      "exclusions": [
-        {
-          "groupId": "com.fasterxml.jackson.core",
-          "artifactId": "jackson-core",
-          "classifier": "",
-          "extension": "",
-          "version": "2.6.6",
-          "description": ""
-        },
-      ]
-    },
-    {
-      "id": "TEZ-NOT-SPARK-1-6-LIB-DYNAMIC",
-      "description": "",
-      "modules": [
-        "jackson-core-2.6.6"
       ]
     },
     {
