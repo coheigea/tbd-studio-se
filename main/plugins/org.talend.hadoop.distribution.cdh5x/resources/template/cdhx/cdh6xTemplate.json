@@ -637,7 +637,8 @@
 					"classifier": "",
 					"extension": "",
 					"description": ""
-				}			
+				}
+				]
 		},
 		{
 			"id": "hive-hbase-handler",
