@@ -46,11 +46,11 @@
 	
 	List<Map<String,String>> genericArgs = new java.util.ArrayList<Map<String,String>>();
 	List<Map<String,String>> toolSpecificArgs = new java.util.ArrayList<Map<String,String>>();
-	if(additionalList != null){ 
-		for(Map<String,String> additionalMap : additionalList){ 
-			if (additionalMap.get("ADDITIONAL_ARGUMENT").startsWith("\"--") || additionalMap.get("ADDITIONAL_ARGUMENT").startsWith("--")){
+	if (additionalList != null) { 
+		for (Map<String,String> additionalMap : additionalList) { 
+			if (additionalMap.get("ADDITIONAL_ARGUMENT").replaceAll("\"","").startsWith("--")) {
 				toolSpecificArgs.add(additionalMap);
-			} else if (additionalMap.get("ADDITIONAL_ARGUMENT").startsWith("-") || additionalMap.get("ADDITIONAL_ARGUMENT").startsWith("\"-")) {
+			} else if (additionalMap.get("ADDITIONAL_ARGUMENT").replaceAll("\"","").startsWith("-")) {
 				genericArgs.add(additionalMap);
 			}
 		}
@@ -70,21 +70,21 @@ String passwordFieldName = "__PASSWORD__";
 
 String[] cmd_<%=cid %> = new String[] {"sqoop", "export"
 <%
-for(Map<String,String> genericArg : genericArgs){
-	if(genericArg.get("ADDITIONAL_VALUE")!=null || !"".equals(genericArg.get("ADDITIONAL_VALUE"))) {
+for (Map<String,String> genericArg : genericArgs) {
+	if (!"".equals(genericArg.get("ADDITIONAL_VALUE"))) {
 	String arg = genericArg.get("ADDITIONAL_ARGUMENT").replaceAll("\"","") + "=" + genericArg.get("ADDITIONAL_VALUE").replaceAll("\"","");
 %>
 		,"<%=arg%>"
 <%
 	}
 }
-if(isUseSpeedParallel && specificParams!=null){
-	for(Map<String,String> specificArg : specificParams){ 
-	 	if(specificArg.get("SPECIFIC_PARAM_VALUE")!=null || !"".equals(specificArg.get("SPECIFIC_PARAM_VALUE"))) { 
+if (isUseSpeedParallel && specificParams!=null) {
+	for (Map<String,String> specificArg : specificParams) { 
+	 	if (!"".equals(specificArg.get("SPECIFIC_PARAM_VALUE"))) { 
 %> 
 			,"-D<%=specificArg.get("SPECIFIC_PARAM")%>="+<%=specificArg.get("SPECIFIC_PARAM_VALUE")%>
-<%  
-	 	} 
+<% 
+		} 
 	} 
 } 
 if(isUseSpeedParallel && isUseAdditionParams){
@@ -95,17 +95,17 @@ if(isUseSpeedParallel && isUseAdditionParams){
 %>
 
 , "--connect", <%=connection%>
-<%if(!callProcStock){
-	if((!"".equals(table.replaceAll("\"","")))){
+<%if (!callProcStock) {
+	if (!table.replaceAll("\"","").isEmpty()) {
 %>, "--table", <%=table%>
 <%	}
 }
-if(!"".equals(username.replaceAll("\"",""))){%>
+if (!username.replaceAll("\"","").isEmpty()) {%>
  , "--username", <%=username%>
 <%}
-if(passwordStoredInFile) {%>
+if (passwordStoredInFile) {%>
 	, "--password-file", <%=(String)ElementParameterParser.getValue(node, "__PASSWORD_FILE__")%>
-<%} else if (!"".equals(ElementParameterParser.getValue(node, "__PASSWORD__").replaceAll("\"",""))) {%>
+<%} else if (!ElementParameterParser.getValue(node, "__PASSWORD__").replaceAll("\"","").isEmpty()) {%>
 	, "--password", decryptedPassword_<%=cid%>
 <%}%>
 <%if(inputSource.equals("HDFS")) {%>
@@ -149,8 +149,8 @@ if(useColumnForUpdate && !callProcStock) {
 	}
 }
 
-for(Map<String,String> toolSpecificArg : toolSpecificArgs){ 
-    if(toolSpecificArg.get("ADDITIONAL_VALUE")!=null || !"".equals(toolSpecificArg.get("ADDITIONAL_VALUE"))) { 
+for (Map<String,String> toolSpecificArg : toolSpecificArgs) { 
+    if (!"".equals(toolSpecificArg.get("ADDITIONAL_VALUE"))) { 
 %> 
         ,<%=toolSpecificArg.get("ADDITIONAL_ARGUMENT")%>, <%=toolSpecificArg.get("ADDITIONAL_VALUE")%> 
 <% 

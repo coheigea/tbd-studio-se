@@ -94,7 +94,7 @@
 
 	<%=sqoopPackageName%>.SqoopOptions sqoopOptions_<%=cid%> = new <%=sqoopPackageName%>.SqoopOptions(configuration_<%=cid%>);
 	sqoopOptions_<%=cid%>.setConnectString(<%=connection%>); // __CONNECTION__
-<% if(!"".equals(username.replaceAll("\"",""))) {%>	
+<% if (!username.replaceAll("\"","").isEmpty()) {%>	
 	sqoopOptions_<%=cid%>.setUsername(<%=username%>); // __USERNAME__
 <%}%>	
 	if((<%=driverClass%> != null) && !"".equals(<%=driverClass%>)) {
@@ -105,9 +105,9 @@
     	}
     }
 	
-   <%if((!passwordStoredInFile || !sqoopDistrib.doJavaAPISupportStorePasswordInFile())) {
+   <%if (!passwordStoredInFile || !sqoopDistrib.doJavaAPISupportStorePasswordInFile()) {
     		passwordFieldName = "__PASSWORD__";
-    		if(!"".equals(ElementParameterParser.getValue(node, "__PASSWORD__").replaceAll("\"",""))){
+    		if (!ElementParameterParser.getValue(node, "__PASSWORD__").replaceAll("\"","").isEmpty()) {
     	%>
 		<%@ include file="@{org.talend.designer.components.localprovider}/components/templates/password.javajet"%>
 		sqoopOptions_<%=cid%>.setPassword(decryptedPassword_<%=cid%>); // __PASSWORD__
@@ -119,7 +119,7 @@
 	
 	<%if(useQuery){%>
 		sqoopOptions_<%=cid%>.setSqlQuery(<%=query%>);
-	<%} else if(!"".equals(table.replaceAll("\"",""))){%>
+	<%} else if (!table.replaceAll("\"","").isEmpty()) {%>
 		sqoopOptions_<%=cid%>.setTableName(<%=table%>); // __TABLE__
 		<%if(useColumns){%>sqoopOptions_<%=cid%>.setColumns(lColumns_<%=cid%>.toArray(new String[lColumns_<%=cid%>.size()]));<%}%>
 		<%if(useWhere){%>sqoopOptions_<%=cid%>.setWhereClause(<%=where%>); // __WHERE__<%}%>
