@@ -468,4 +468,8 @@ public class MapR611Distribution extends AbstractMapRDistribution implements HDF
     public boolean useS3AProperties() {
         return true;
     }
+
+    public boolean doSupportLightWeight() {
+        return true;
+    }
 }
